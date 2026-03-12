@@ -1,42 +1,71 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="ThriftBox">
-      {assigns[:page_title]}
-    </.live_title>
-    <%!-- Подключение стилей и скриптов --%>
+    <.live_title default="ThriftBox">{assigns[:page_title]}</.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}></script>
+
+    <%!-- ПЕРЕНЕСЛИ СТИЛИ СЮДА (внутри head) --%>
+    <style>
+      body { 
+        background-color: #403f40 !important; 
+      }
+      header { 
+        background-color: #403f40  !important; 
+        border-bottom: 1px solid #e4e4e7 !important;
+      }
+      /* Делаем поля ввода (Settings) красивыми */
+      input[type="text"], input[type="email"], input[type="password"] {
+        background-color: #e2e8f0  !important;
+        border: 1px solid #c6c6c7 !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        width: 100% !important;
+        color: #18181b !important;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important;
+      }
+      input:focus {
+        outline: 3px solid rgba(79, 70, 229, 0.2) !important;
+        border-color: #4f46e5 !important;
+      }
+      .content-card {
+        background: white !important;
+        border-radius: 16px !important;
+        padding: 2.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid #e4e4e7 !important;
+        margin-top: 2rem;
+      }
+    </style>
   </head>
-  <body class="bg-base-100 antialiased">
-  
-    <header style="display: flex; justify-content: space-between; padding: 20px; border-bottom: 2px solid red; background: white;">
-  <div style="font-weight: bold; color: black;">
-    <.link navigate={~p"/"}>HOME (ThriftBox)</.link>
-  </div>
 
-  <nav style="background: #eee; padding: 10px; display: flex; gap: 20px;">
-  <%!-- ТЕСТ 1: Просто текст (должен быть виден всегда) --%>
-  <span style="color: red; font-weight: bold;">ТЕСТ КНОПОК:</span>
+  <body class="antialiased">
+    <header class="sticky top-0 z-50 w-full shadow-sm">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <.link navigate={~p"/"} class="text-xl font-black tracking-tighter text-indigo-600 hover:text-indigo-500">
+          THRIFTBOX
+        </.link>
+        
+        <nav>
+          <ul class="flex items-center gap-6 text-sm font-semibold leading-6 text-zinc-900">
+            <% user = (assigns[:current_scope] && assigns[:current_scope].user) || assigns[:current_user] %>
+            <%= if user do %>
+              <li class="text-zinc-500 italic">Привет, <%= user.name %></li>
+              <li><.link navigate={~p"/users/settings"} class="hover:text-indigo-600">Settings</.link></li>
+              <li><.link href={~p"/users/log-out"} method="delete" class="hover:text-red-600">Log out</.link></li>
+            <% else %>
+              <li><.link navigate={~p"/users/log-in"} class="hover:text-indigo-600">Log in</.link></li>
+              <li><.link navigate={~p"/users/register"} class="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500">Register</.link></li>
+            <% end %>
+            <li class="border-l border-zinc-300 pl-4"><.theme_toggle /></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
 
-  <%!-- ТЕСТ 2: Прямые ссылки без всяких IF --%>
-  <.link navigate={~p"/users/register"} style="color: blue; text-decoration: underline;">РЕГИСТРАЦИЯ</.link>
-  <.link navigate={~p"/users/log-in"} style="color: blue; text-decoration: underline;">ВХОД</.link>
-  <.link navigate={~p"/users/settings"} style="color: green; text-decoration: underline;">НАСТРОЙКИ</.link>
-  
-  <%!-- ТЕСТ 3: Попытка вывести имя Боба напрямую из твоего лога --%>
-  <span style="color: black;">
-    ИМЯ ИЗ ЛОГА: 
-    <%= if assigns[:current_scope], do: assigns[:current_scope].user.name, else: "НЕТ ДАННЫХ" %>
-  </span>
-</nav>
-</header>
-
-    <%!-- Сюда вставляется контент страниц --%>
     {@inner_content}
   </body>
 </html>

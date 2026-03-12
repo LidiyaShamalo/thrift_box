@@ -1,15 +1,19 @@
-<div class="px-4 py-10 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-4xl text-center">
-    <h1 class="text-4xl font-bold tracking-tight text-zinc-800 sm:text-6xl">
-      Добро пожаловать в ThriftBox!
+<div class="px-6 lg:px-8">
+  <%!-- Уменьшили py-32 до py-12 --%>
+  <div class="mx-auto max-w-2xl py-12 sm:py-20 lg:py-24 text-center border-t border-zinc-100">
+    <h1 class="text-4xl font-bold tracking-tight text-zinc-900 sm:text-6xl">
+      ThriftBox: Prototype to Production
     </h1>
     <p class="mt-6 text-lg leading-8 text-zinc-600">
-      Твой проект успешно запущен. Теперь контент занимает всю ширину и ничего не перекрывает меню.
+      Build rich, interactive user experiences with Elixir and Phoenix.
     </p>
     <div class="mt-10 flex items-center justify-center gap-x-6">
-      <.link navigate={~p"/users/register"} class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
-        Начать работу
-      </.link>
+      <a href="https://hexdocs.pm" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+        Get Started
+      </a>
+      <a href="https://github.com" class="text-sm font-semibold leading-6 text-zinc-900">
+        Learn more <span aria-hidden="true">→</span>
+      </a>
     </div>
   </div>
 </div>

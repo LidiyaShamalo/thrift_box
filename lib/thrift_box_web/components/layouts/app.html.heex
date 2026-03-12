@@ -1,7 +1,8 @@
-<main class="px-4 py-10 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
+<!-- lib/thrift_box_web/components/layouts/app.html.heex -->
+<main class="px-4 py-12 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-2xl content-card"> <%!-- Добавили класс content-card --%>
     <.flash_group flash={@flash} />
-    <%!-- Для LiveView используем render_slot --%>
+    
     <%= if assigns[:inner_block] do %>
       {render_slot(@inner_block)}
     <% else %>
