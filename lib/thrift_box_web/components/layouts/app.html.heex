@@ -1,0 +1,11 @@
+<main class="px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-2xl">
+    <.flash_group flash={@flash} />
+    <%!-- Для LiveView используем render_slot --%>
+    <%= if assigns[:inner_block] do %>
+      {render_slot(@inner_block)}
+    <% else %>
+      {@inner_content}
+    <% end %>
+  </div>
+</main>

@@ -76,8 +76,13 @@ defmodule ThriftBox.Accounts do
   """
   def register_user(attrs) do
     %User{}
-    |> User.email_changeset(attrs)
+    |> User.registration_changeset(attrs)#email_changeset(attrs)
     |> Repo.insert()
+  end
+
+  # added!!!
+  def change_user_registration(%User{} = user, attrs \\ %{}) do
+    User.registration_changeset(user, attrs, hash_password: false)
   end
 
   ## Settings
@@ -121,15 +126,26 @@ defmodule ThriftBox.Accounts do
 
     Repo.transact(fn ->
       with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
-           %UserToken{sent_to: email} <- Repo.one(query),
-           {:ok, user} <- Repo.update(User.email_changeset(user, %{email: email})),
-           {_count, _result} <-
-             Repo.delete_all(from(UserToken, where: [user_id: ^user.id, context: ^context])) do
+          %UserToken{sent_to: email} <- Repo.one(query),
+          {:ok, user} <- Repo.update(User.email_changeset(user, %{email: email})),
+          {_count, _result} <-
+            Repo.delete_all(from(UserToken, where: [user_id: ^user.id, context: ^context])) do
         {:ok, user}
       else
         _ -> {:error, :transaction_aborted}
       end
     end)
+  end
+
+  def update_user_name(user, attrs) do
+    user
+
+    |> User.name_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_user_name(user, attrs \\ %{}) do
+    User.name_changeset(user, attrs)
   end
 
   @doc """
@@ -193,7 +209,7 @@ defmodule ThriftBox.Accounts do
   """
   def get_user_by_magic_link_token(token) do
     with {:ok, query} <- UserToken.verify_magic_link_token_query(token),
-         {user, _token} <- Repo.one(query) do
+        {user, _token} <- Repo.one(query) do
       user
     else
       _ -> nil

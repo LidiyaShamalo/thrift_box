@@ -6,12 +6,22 @@ defmodule ThriftBox.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :name, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 
     timestamps(type: :utc_datetime)
+  end
+
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+
+    |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
+    |> validate_email(opts)
+    |> validate_password(opts)
+    |> validate_required([:name]) # Делаем имя обязательным
   end
 
   @doc """
@@ -29,6 +39,13 @@ defmodule ThriftBox.Accounts.User do
     user
     |> cast(attrs, [:email])
     |> validate_email(opts)
+  end
+
+  def name_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+    |> validate_length(:name, min: 2, max: 100)
   end
 
   defp validate_email(changeset, opts) do

@@ -1,7 +1,7 @@
 defmodule ThriftBoxWeb.UserLive.Settings do
   use ThriftBoxWeb, :live_view
 
-  on_mount {ThriftBoxWeb.UserAuth, :require_sudo_mode}
+  on_mount({ThriftBoxWeb.UserAuth, :require_sudo_mode})
 
   alias ThriftBox.Accounts
 
@@ -12,59 +12,49 @@ defmodule ThriftBoxWeb.UserLive.Settings do
       <div class="text-center">
         <.header>
           Account Settings
-          <:subtitle>Manage your account email address and password settings</:subtitle>
+          <:subtitle>Manage your name, email address and password settings</:subtitle>
         </.header>
       </div>
 
-      <.form for={@email_form} id="email_form" phx-submit="update_email" phx-change="validate_email">
-        <.input
-          field={@email_form[:email]}
-          type="email"
-          label="Email"
-          autocomplete="username"
-          spellcheck="false"
-          required
-        />
-        <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
-      </.form>
+      <div class="space-y-12">
+        <%!-- Форма имени --%>
+        <.form for={@name_form} id="name_form" phx-submit="update_name" phx-change="validate_name">
+          <.input field={@name_form[:name]} type="text" label="Name" required />
+          <div class="mt-2">
+            <.button variant="primary" phx-disable-with="Updating...">Update Name</.button>
+          </div>
+        </.form>
 
-      <div class="divider" />
+        <div class="divider" />
 
-      <.form
-        for={@password_form}
-        id="password_form"
-        action={~p"/users/update-password"}
-        method="post"
-        phx-change="validate_password"
-        phx-submit="update_password"
-        phx-trigger-action={@trigger_submit}
-      >
-        <input
-          name={@password_form[:email].name}
-          type="hidden"
-          id="hidden_user_email"
-          spellcheck="false"
-          value={@current_email}
-        />
-        <.input
-          field={@password_form[:password]}
-          type="password"
-          label="New password"
-          autocomplete="new-password"
-          spellcheck="false"
-          required
-        />
-        <.input
-          field={@password_form[:password_confirmation]}
-          type="password"
-          label="Confirm new password"
-          autocomplete="new-password"
-          spellcheck="false"
-        />
-        <.button variant="primary" phx-disable-with="Saving...">
-          Save Password
-        </.button>
-      </.form>
+        <%!-- Форма почты --%>
+        <.form for={@email_form} id="email_form" phx-submit="update_email" phx-change="validate_email">
+          <.input field={@email_form[:email]} type="email" label="Email" required />
+          <div class="mt-2">
+            <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
+          </div>
+        </.form>
+
+        <div class="divider" />
+
+        <%!-- Форма пароля --%>
+        <.form
+          for={@password_form}
+          id="password_form"
+          action={~p"/users/update-password"}
+          method="post"
+          phx-change="validate_password"
+          phx-submit="update_password"
+          phx-trigger-action={@trigger_submit}
+        >
+          <input name={@password_form[:email].name} type="hidden" value={@current_email} />
+          <.input field={@password_form[:password]} type="password" label="New password" required />
+          <.input field={@password_form[:password_confirmation]} type="password" label="Confirm new password" />
+          <div class="mt-2">
+            <.button variant="primary" phx-disable-with="Saving...">Save Password</.button>
+          </div>
+        </.form>
+      </div>
     </Layouts.app>
     """
   end
@@ -86,12 +76,14 @@ defmodule ThriftBoxWeb.UserLive.Settings do
   def mount(_params, _session, socket) do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
+    name_changeset = Accounts.change_user_name(user)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
 
     socket =
       socket
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
+      |> assign(:name_form, to_form(name_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
 
@@ -131,6 +123,40 @@ defmodule ThriftBoxWeb.UserLive.Settings do
         {:noreply, assign(socket, :email_form, to_form(changeset, action: :insert))}
     end
   end
+
+    @impl true
+  def handle_event("validate_name", %{"user" => user_params}, socket) do
+    name_form =
+      socket.assigns.current_scope.user
+
+      |> Accounts.change_user_name(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, name_form: name_form)}
+  end
+
+  def handle_event("update_name", %{"user" => user_params}, socket) do
+  user = socket.assigns.current_scope.user
+
+  case Accounts.update_user_name(user, user_params) do
+    {:ok, updated_user} ->
+      # Обновляем вложенный объект user внутри current_scope
+      updated_scope = %{socket.assigns.current_scope | user: updated_user}
+
+      socket =
+        socket
+
+        |> assign(:current_scope, updated_scope) # Теперь шапка увидит новое имя
+        |> assign(:name_form, to_form(Accounts.change_user_name(updated_user)))
+        |> put_flash(:info, "Name updated successfully!")
+
+      {:noreply, socket}
+
+    {:error, changeset} ->
+      {:noreply, assign(socket, name_form: to_form(changeset))}
+  end
+end
 
   def handle_event("validate_password", params, socket) do
     %{"user" => user_params} = params

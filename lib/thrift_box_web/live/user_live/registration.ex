@@ -33,6 +33,20 @@ defmodule ThriftBoxWeb.UserLive.Registration do
             phx-mounted={JS.focus()}
           />
 
+          <.input
+            field={@form[:name]}
+            type="text"
+            label="Name"
+            required
+            />
+
+          <.input
+            field={@form[:password]}
+            type="password"
+            label="Password"
+            required
+            />
+
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
           </.button>
@@ -65,12 +79,12 @@ defmodule ThriftBoxWeb.UserLive.Registration do
           )
 
         {:noreply,
-         socket
-         |> put_flash(
-           :info,
-           "An email was sent to #{user.email}, please access it to confirm your account."
-         )
-         |> push_navigate(to: ~p"/users/log-in")}
+          socket
+          |> put_flash(
+            :info,
+            "An email was sent to #{user.email}, please access it to confirm your account."
+          )
+          |> push_navigate(to: ~p"/users/log-in")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}

@@ -79,3 +79,51 @@ mix deps.get
 ```bash
 mix test
 ```
+
+## 6. Добавление поля имени пользователя
+
+Добавить поле в модель:
+
+```elixir
+defmodule ThriftBox.Accounts.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+  schema "users" do
+    field :email, :string
+    field :name, :string
+    field :password, :string, virtual: true, redact: true
+    ...
+```
+
+Создать миграцию:
+
+```bash
+mix ecto.gen.migration add_user_name
+#                       ^^^^^^^^^
+#                    имя файла миграции
+```
+
+Обновить файл миграции:
+
+```elixir
+defmodule ThriftBox.Repo.Migrations.AddUserName do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      add :name, :string
+    end
+
+  end
+end
+```
+
+Проверить
+
+```bash
+mix test
+```
+
