@@ -6,6 +6,7 @@ defmodule ThriftBox.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :name, :string  # 13/03 name
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
@@ -14,6 +15,28 @@ defmodule ThriftBox.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  # do - name 13/03
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+
+    |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
+    |> validate_email(opts)
+    |> validate_password(opts)
+    |> validate_required([:name]) # Делаем имя обязательным
+    |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
+    |> validate_email(opts)
+    |> validate_password(opts)
+    |> validate_required([:name]) # Делаем имя обязательным
+  end
+  # end - name 13/03
+  # do - name 13/03
+  def name_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+    |> validate_length(:name, min: 2, max: 100)
+  end
+  # end - name 13/03
   @doc """
   A user changeset for registering or changing the email.
 
