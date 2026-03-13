@@ -22,11 +22,7 @@ defmodule ThriftBox.Accounts.User do
     |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
     |> validate_email(opts)
     |> validate_password(opts)
-    |> validate_required([:name]) # Делаем имя обязательным
-    |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
-    |> validate_email(opts)
-    |> validate_password(opts)
-    |> validate_required([:name]) # Делаем имя обязательным
+    #|> validate_required([:name]) # Делаем имя обязательным
   end
   # end - name 13/03
   # do - name 13/03
@@ -37,6 +33,7 @@ defmodule ThriftBox.Accounts.User do
     |> validate_length(:name, min: 2, max: 100)
   end
   # end - name 13/03
+
   @doc """
   A user changeset for registering or changing the email.
 

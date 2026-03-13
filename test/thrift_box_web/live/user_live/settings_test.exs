@@ -12,6 +12,7 @@ defmodule ThriftBoxWeb.UserLive.SettingsTest do
         |> log_in_user(user_fixture())
         |> live(~p"/users/settings")
 
+      #assert html =~ "Update Name"  # 13/03 проверка отображения поля
       assert html =~ "Change Email"
       assert html =~ "Save Password"
     end
@@ -36,6 +37,40 @@ defmodule ThriftBoxWeb.UserLive.SettingsTest do
       assert conn.resp_body =~ "You must re-authenticate to access this page."
     end
   end
+
+#   # Check name-form 13/03
+#   describe "update name form" do
+#   setup %{conn: conn} do
+#     user = user_fixture()
+#     %{conn: log_in_user(conn, user), user: user}
+#   end
+
+#   test "updates the user name", %{conn: conn} do
+#     {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+#     result =
+#       lv
+
+#       |> form("#name_form", %{"user" => %{"name" => "New Name"}})
+#       |> render_submit()
+
+#     assert result =~ "Name updated successfully."
+#   end
+
+#   test "renders errors for invalid name", %{conn: conn} do
+#     {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+#     result =
+#       lv
+
+#       # |> element("#name_form") # -2
+#       |> form("#name_form", %{"user" => %{"name" => ""}}) # +2
+#       |> render_change() # %{"user" => %{"name" => ""}})  - 2# если имя обязательное
+
+#     assert result =~ "can't be blank"
+#   end
+# end
+# # End check name-form
 
   describe "update email form" do
     setup %{conn: conn} do

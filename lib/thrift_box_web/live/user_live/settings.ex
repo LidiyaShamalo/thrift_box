@@ -1,7 +1,7 @@
 defmodule ThriftBoxWeb.UserLive.Settings do
   use ThriftBoxWeb, :live_view
 
-  on_mount {ThriftBoxWeb.UserAuth, :require_sudo_mode}
+  on_mount({ThriftBoxWeb.UserAuth, :require_sudo_mode})
 
   alias ThriftBox.Accounts
 
@@ -27,6 +27,20 @@ defmodule ThriftBoxWeb.UserLive.Settings do
         />
         <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
       </.form>
+
+    <!--Начало: Добавление поля для ввода имени
+      <.form for={@name_form} id="name_form" phx-submit="update_name" phx-change="validate_name">
+        <.input
+          field={@name_form[:name]}
+          type="text"
+          label="Name"
+          autocomplete="username"
+          spellcheck="false"
+          required
+        />
+        <.button variant="primary" phx-disable-with="Updating...">Update Name</.button>
+      </.form>
+    End: Добавление поля для ввода имени-->
 
       <div class="divider" />
 
@@ -83,13 +97,16 @@ defmodule ThriftBoxWeb.UserLive.Settings do
     {:ok, push_navigate(socket, to: ~p"/users/settings")}
   end
 
+  #Добавляю логику для name_form 13/03
   def mount(_params, _session, socket) do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
+    #name_changeset = Accounts.change_user_name(user, %{}) #13/03
 
     socket =
       socket
+      #|> assign(:name_form, to_form(name_changeset)) # add 13/03
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
@@ -157,4 +174,30 @@ defmodule ThriftBoxWeb.UserLive.Settings do
         {:noreply, assign(socket, password_form: to_form(changeset, action: :insert))}
     end
   end
+
+  # # 13/03 Обработчики событий:
+  # def handle_event("validate_name", params, socket) do #%{"user" => user_params}, socket) do
+
+  #   IO.inspect(params, label: "PARAMS FROM FORM") # 2
+
+  #   user_params = Map.get(params, "user", %{}) # 2
+  #   form =
+  #     socket.assigns.current_scope.user
+
+  #     |> Accounts.change_user_name(user_params)
+  #     |> Map.put(:action, :validate)
+  #     |> to_form()
+
+  #   {:noreply, assign(socket, name_form: form)}
+  # end
+
+  # def handle_event("update_name", %{"user" => user_params}, socket) do
+  #   case Accounts.update_user_name(socket.assigns.current_scope.user, user_params) do
+  #     {:ok, _user} ->
+  #       {:noreply, put_flash(socket, :info, "Name updated successfully.")}
+  #     {:error, changeset} ->
+  #       {:noreply, assign(socket, name_form: to_form(changeset))}
+  #   end
+  # end
+  # # End 13/03
 end
