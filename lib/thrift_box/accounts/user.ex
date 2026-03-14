@@ -20,34 +20,24 @@ defmodule ThriftBox.Accounts.User do
     user
 
     |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
+    |> validate_name()
     |> validate_email(opts)
     |> validate_password(opts)
-    |> validate_required([:name]) # Делаем имя обязательным
-    |> cast(attrs, [:email, :password, :name]) # Добавляем :name сюда
-    |> validate_email(opts)
-    |> validate_password(opts)
-    |> validate_required([:name]) # Делаем имя обязательным
+
   end
-  # end - name 13/03
-  # do - name 13/03
+
   def name_changeset(user, attrs, _opts \\ []) do
     user
     |> cast(attrs, [:name])
-    |> validate_required([:name])
-    |> validate_length(:name, min: 2, max: 100)
+    |> validate_name()
   end
-  # end - name 13/03
-  @doc """
-  A user changeset for registering or changing the email.
 
-  It requires the email to change otherwise an error is added.
+  defp validate_name(changeset) do
+    changeset
+    |> validate_required([:name], message: "Пожалуйста, введите имя")
+    |> validate_length(:name, min: 2, max: 100, message: "Имя должно быть от 2 до 100 символов")
+  end
 
-  ## Options
-
-    * `:validate_unique` - Set to false if you don't want to validate the
-      uniqueness of the email, useful when displaying live validations.
-      Defaults to `true`.
-  """
   def email_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email])
@@ -59,7 +49,7 @@ defmodule ThriftBox.Accounts.User do
       changeset
       |> validate_required([:email])
       |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
-        message: "must have the @ sign and no spaces"
+        message: "Обязательно должен присутствовать знак @ и не должно быть пробелов."
       )
       |> validate_length(:email, max: 160)
 
@@ -75,31 +65,16 @@ defmodule ThriftBox.Accounts.User do
 
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
-      add_error(changeset, :email, "did not change")
+      add_error(changeset, :email, "не изменился")
     else
       changeset
     end
   end
 
-  @doc """
-  A user changeset for changing the password.
-
-  It is important to validate the length of the password, as long passwords may
-  be very expensive to hash for certain algorithms.
-
-  ## Options
-
-    * `:hash_password` - Hashes the password so it can be stored securely
-      in the database and ensures the password field is cleared to prevent
-      leaks in the logs. If password hashing is not needed and clearing the
-      password field is not desired (like when using this changeset for
-      validations on a LiveView form), this option can be set to `false`.
-      Defaults to `true`.
-  """
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_confirmation(:password, message: "Поле не соответствует паролю")
     |> validate_password(opts)
   end
 
@@ -129,20 +104,12 @@ defmodule ThriftBox.Accounts.User do
     end
   end
 
-  @doc """
-  Confirms the account by setting `confirmed_at`.
-  """
+
   def confirm_changeset(user) do
     now = DateTime.utc_now(:second)
     change(user, confirmed_at: now)
   end
 
-  @doc """
-  Verifies the password.
-
-  If there is no user or the user doesn't have a password, we call
-  `Argon2.no_user_verify/0` to avoid timing attacks.
-  """
   def valid_password?(%ThriftBox.Accounts.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Argon2.verify_pass(password, hashed_password)
