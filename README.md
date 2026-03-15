@@ -86,6 +86,12 @@ mix test
 sudo -u postgres psql -d thrift_box_dev
 ```
 
+проверить список отношений:
+
+```psql
+thrift_box_dev=# \dt
+```
+
 ## Phoenix LiveView forms
 
 ### Этапы прохождения Form
