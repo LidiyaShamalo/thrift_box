@@ -147,7 +147,7 @@ defmodule ThriftBoxWeb.UserLive.Settings do
   def handle_event("update_password", params, socket) do
     %{"user" => user_params} = params
     user = socket.assigns.current_scope.user
-    true = Accounts.sudo_mode?(user)
+    true = Accounts.sudo_mode?(user) 
 
     case Accounts.change_user_password(user, user_params) do
       %{valid?: true} = changeset ->

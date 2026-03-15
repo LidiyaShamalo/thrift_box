@@ -14,8 +14,20 @@ defmodule ThriftBox.AccountsFixtures do
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
-      email: unique_user_email()
+      email: unique_user_email(),
+      name: "Test User",
+      password: "hello_world_12"
     })
+  end
+
+  def confirmed_user_fixture(attrs \\ %{}) do
+    user = unconfirmed_user_fixture(attrs)
+
+    # Напрямую обновляем в базе, минуя валидации
+    {:ok, user} =
+      ThriftBox.Repo.update(Ecto.Changeset.change(user, confirmed_at: DateTime.utc_now() |> DateTime.truncate(:second)))
+
+    user
   end
 
   def unconfirmed_user_fixture(attrs \\ %{}) do
@@ -28,7 +40,7 @@ defmodule ThriftBox.AccountsFixtures do
   end
 
   def user_fixture(attrs \\ %{}) do
-    user = unconfirmed_user_fixture(attrs)
+    user = confirmed_user_fixture(attrs)
 
     token =
       extract_user_token(fn url ->

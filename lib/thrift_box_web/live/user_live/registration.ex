@@ -53,7 +53,7 @@ defmodule ThriftBoxWeb.UserLive.Registration do
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_registration(%User{},  %{})  #, validate_unique: false) # заменила change_user_email
 
-    {:ok, assign_form(socket, changeset), temporary_assigns: [form: nil]}
+    {:ok, assign_form(socket, changeset)} #, temporary_assigns: [form: nil]}
   end
 
   @impl true
@@ -88,4 +88,4 @@ defmodule ThriftBoxWeb.UserLive.Registration do
     form = to_form(changeset, as: "user")
     assign(socket, form: form)
   end
-end
+end 

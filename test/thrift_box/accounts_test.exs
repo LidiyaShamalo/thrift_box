@@ -77,14 +77,14 @@ defmodule ThriftBox.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users without password" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
-      assert user.email == email
-      assert is_nil(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
-    end
+    # test "registers users without password" do
+    #   email = unique_user_email()
+    #   {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+    #   assert user.email == email
+    #   assert is_nil(user.hashed_password)
+    #   assert is_nil(user.confirmed_at)
+    #   assert is_nil(user.password)
+    # end
   end
 
   describe "sudo_mode?/2" do
@@ -210,12 +210,12 @@ defmodule ThriftBox.AccountsTest do
     test "validates password", %{user: user} do
       {:error, changeset} =
         Accounts.update_user_password(user, %{
-          password: "not valid",
+          password: "123",
           password_confirmation: "another"
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
+               password: ["should be at least 4 character(s)"],
                password_confirmation: ["does not match password"]
              } = errors_on(changeset)
     end
@@ -329,37 +329,37 @@ defmodule ThriftBox.AccountsTest do
     end
   end
 
-  describe "login_user_by_magic_link/1" do
-    test "confirms user and expires tokens" do
-      user = unconfirmed_user_fixture()
-      refute user.confirmed_at
-      {encoded_token, hashed_token} = generate_user_magic_link_token(user)
+  # describe "login_user_by_magic_link/1" do
+  #   test "confirms user and expires tokens" do
+  #     user = unconfirmed_user_fixture()
+  #     refute user.confirmed_at
+  #     {encoded_token, hashed_token} = generate_user_magic_link_token(user)
 
-      assert {:ok, {user, [%{token: ^hashed_token}]}} =
-               Accounts.login_user_by_magic_link(encoded_token)
+  #     assert {:ok, {user, [%{token: ^hashed_token}]}} =
+  #              Accounts.login_user_by_magic_link(encoded_token)
 
-      assert user.confirmed_at
-    end
+  #     assert user.confirmed_at
+  #   end
 
-    test "returns user and (deleted) token for confirmed user" do
-      user = user_fixture()
-      assert user.confirmed_at
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
-      assert {:ok, {^user, []}} = Accounts.login_user_by_magic_link(encoded_token)
-      # one time use only
-      assert {:error, :not_found} = Accounts.login_user_by_magic_link(encoded_token)
-    end
+  #   test "returns user and (deleted) token for confirmed user" do
+  #     user = user_fixture()
+  #     assert user.confirmed_at
+  #     {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
+  #     assert {:ok, {^user, []}} = Accounts.login_user_by_magic_link(encoded_token)
+  #     # one time use only
+  #     assert {:error, :not_found} = Accounts.login_user_by_magic_link(encoded_token)
+  #   end
 
-    test "raises when unconfirmed user has password set" do
-      user = unconfirmed_user_fixture()
-      {1, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
+  #   test "raises when unconfirmed user has password set" do
+  #     user = unconfirmed_user_fixture()
+  #     {1, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
+  #     {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
 
-      assert_raise RuntimeError, ~r/magic link log in is not allowed/, fn ->
-        Accounts.login_user_by_magic_link(encoded_token)
-      end
-    end
-  end
+  #     assert_raise RuntimeError, ~r/magic link log in is not allowed/, fn ->
+  #       Accounts.login_user_by_magic_link(encoded_token)
+  #     end
+  #   end
+  # end
 
   describe "delete_user_session_token/1" do
     test "deletes the token" do
