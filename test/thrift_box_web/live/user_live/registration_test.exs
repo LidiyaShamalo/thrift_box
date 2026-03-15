@@ -25,13 +25,22 @@ defmodule ThriftBoxWeb.UserLive.RegistrationTest do
     test "renders errors for invalid data", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
+      #Добавлю пока имитацию ввода
+      lv |> form("#registration_form", user: %{"email" => "invalid"}) |> render_change()
+
       result =
         lv
-        |> element("#registration_form")
-        |> render_change(user: %{"email" => "with spaces"})
+        |> form("#registration_form", user: %{ #element("#registration_form")
+        #|> render_change(user: %{
+          "email" => "with spaces",
+          "name" => "а",
+          "password" => "12"
+          })
+        |> render_submit()
 
-      assert result =~ "Register"
       assert result =~ "must have the @ sign and no spaces"
+      assert result =~ "Имя должно быть от 2 до 100 символов" # Ваша ошибка из validate_name
+      assert result =~ "should be at least 4 character(s)"
     end
   end
 
@@ -40,25 +49,36 @@ defmodule ThriftBoxWeb.UserLive.RegistrationTest do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
+      form = form(lv, "#registration_form", user: %{
+        "email" => email,
+        "name" => "Some Name",
+        "password" => "hello_world_1"
+        })
 
       {:ok, _lv, html} =
         render_submit(form)
         |> follow_redirect(conn, ~p"/users/log-in")
 
       assert html =~
-               ~r/An email was sent to .*, please access it to confirm your account/
+              ~r/An email was sent to .*, please access it to confirm your account/
     end
 
     test "renders errors for duplicated email", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
-      user = user_fixture(%{email: "test@email.com"})
+      user = user_fixture(%{
+        email: "test@email.com",
+        name: "Existing",
+        password: "password_1234"})
 
       result =
         lv
         |> form("#registration_form",
-          user: %{"email" => user.email}
+          user: %{
+            "email" => user.email,
+            "name" => "New User",
+            "password" => "012345678910"
+          }
         )
         |> render_submit()
 

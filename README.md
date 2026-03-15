@@ -79,3 +79,15 @@ mix deps.get
 ```bash
 mix test
 ```
+
+## Зайти в БД
+
+```bash
+sudo -u postgres psql -d thrift_box_dev
+```
+
+## Phoenix LiveView forms
+
+### Этапы прохождения Form
+
+***LiveView*** (отобразит форму - registration.ex) ---renders a---> ***Form*** (форма будет ссылаться на набор изменений - user.ex) ---references a---> ***Changeset***(определяется в схеме) ---defined with a---> ***Schema***(ThriftBox.Accounts.User -> добавление поля имени) ---migrated into the---> ***Database***(создали миграцию ThriftBox.Repo.Migrations.AddUserName - командой $ mix ecto.gen.migration add_user_name)
