@@ -18,7 +18,9 @@ defmodule ThriftBoxWeb.BudgetListLiveTest do
       budget = budget_fixture(%{creator_id: user.id})
 
       conn = log_in_user(conn, user)
-      {:ok, _lv, html} = live(conn, ~p"/budgets")
+      {:ok, lv, html} = live(conn, ~p"/budgets")
+
+      open_browser(lv)
 
       assert html =~ budget.name
       assert html =~ budget.description
