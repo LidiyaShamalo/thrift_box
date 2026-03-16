@@ -27,4 +27,42 @@ defmodule ThriftBox.TrackingTest do
     end
   end
 
+  test "create_budget/2 require name" do
+    user = ThriftBox.AccountsFixtures.user_fixture()
+
+    attr_without_name = %{
+      description: "some descroption",
+      start_date: ~D[2026-01-01],
+      end_date: ~D[2026-01-31],
+      creator_id: user.id
+    }
+
+    assert {:error, %Ecto.Changeset{} = changeset} =
+      Tracking.create_budget(attr_without_name)
+
+    assert changeset.valid? == false
+    assert Keyword.keys(changeset.errors) == [:name]
+    assert %{name: ["can't be blank"]} = errors_on(changeset)
+
+  end
+
+  test "create_budget/2 require valid dates" do
+    user = ThriftBox.AccountsFixtures.user_fixture()
+
+    attrs_end_before_start = %{
+      name: "some name",
+      description: "some descroption",
+      start_date: ~D[2026-01-31],
+      end_date: ~D[2026-01-01],
+      creator_id: user.id
+    }
+
+    assert {:error, %Ecto.Changeset{} = changeset} =
+      Tracking.create_budget(attrs_end_before_start)
+
+    assert changeset.valid? == false
+    #dbg(changeset) #проверить в чем ошибка
+    assert %{end_date: ["must end after start date"]} = errors_on(changeset) # errors_on - вспомогательная функция, которая помогает выводить ошибки
+  end
+
 end
