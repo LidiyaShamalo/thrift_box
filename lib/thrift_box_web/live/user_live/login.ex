@@ -46,6 +46,7 @@ defmodule ThriftBoxWeb.UserLive.Login do
           <.input
             readonly={!!@current_scope}
             field={f[:email]}
+            id="user_email"
             type="email"
             label="Email"
             autocomplete="username"
@@ -99,9 +100,9 @@ defmodule ThriftBoxWeb.UserLive.Login do
       "If your email is in our system, you will receive instructions for logging in shortly."
 
     {:noreply,
-     socket
-     |> put_flash(:info, info)
-     |> push_navigate(to: ~p"/users/log-in")}
+      socket
+      |> put_flash(:info, info)
+      |> push_navigate(to: ~p"/users/log-in")}
   end
 
   defp local_mail_adapter? do
