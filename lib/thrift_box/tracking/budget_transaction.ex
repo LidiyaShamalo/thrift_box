@@ -23,6 +23,6 @@ defmodule ThriftBox.Tracking.BudgetTransaction do
     |> cast(attrs, [:effective_date, :type, :amount, :description, :budget_id])
     |> validate_required([:effective_date, :type, :amount, :description, :budget_id])
     #|> put_change(:user_id, user_scope.user.id)
-    |> validate_number(:amount, greater_than_or_equl_to: 0)
+    |> validate_number(:amount, greater_than_or_equal_to: 0)
   end
 end
