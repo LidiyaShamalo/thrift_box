@@ -1,5 +1,5 @@
 # изменяет временную папку для сохранения html
-System.put_env("TMPDIR", System.cwd!())
+System.put_env("TMPDIR", File.cwd!())
 
 import Config
 
