@@ -166,3 +166,11 @@ INSERT INTO "budgets" ("name","creator_id","end_date","start_date","inserted_at"
  }
 }
  ```
+
+
+ ## dfd
+
+ ```bash
+  mix phx.gen.schema
+ ```
+ 
