@@ -1,3 +1,6 @@
+# изменяет временную папку для сохранения html
+System.put_env("TMPDIR", System.cwd!())
+
 import Config
 
 # Only in tests, remove the complexity from the password hashing algorithm
