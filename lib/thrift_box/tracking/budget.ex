@@ -26,6 +26,11 @@ defmodule ThriftBox.Tracking.Budget do
     |> validate_required([:name, :start_date, :end_date, :creator_id])
     |> validate_length(:name, max: 100)
     |> validate_length(:description, max: 500)
+    |> check_constraint(:end_date,
+        name: :budget_and_after_start,
+        message: "must end after start date"
+      )
+
 
     # |> validate_end_date_after_start_date()
     # |> ThriftBox.Validations.validate_date_month_boundaries()

@@ -1,6 +1,7 @@
 defmodule ThriftBox.TrackingTest do
-
   use ThriftBox.DataCase
+
+  import ThriftBox.TrackingFixtures
 
   alias ThriftBox.Tracking
 
@@ -10,21 +11,39 @@ defmodule ThriftBox.TrackingTest do
     test "create_budget/2 with valid data creates budget" do
       user = ThriftBox.AccountsFixtures.user_fixture()
 
-      valid_attrs = %{
-        name: "some name",
-        description: "some description",
-        start_date: ~D[2026-01-01],
-        end_date: ~D[2026-01-31],
-        creator_id: user.id
-      }
+      attrs = valid_budget_attributes(%{creator_id: user.id})
 
-      assert {:ok, %Budget{} = budget} = Tracking.create_budget(valid_attrs)
-      assert budget.name == "some name"
-      assert budget.description == "some description"
-      assert budget.start_date == ~D[2026-01-01]
-      assert budget.end_date == ~D[2026-01-31]
+      assert {:ok, %Budget{} = budget} = Tracking.create_budget(attrs)
+      assert budget.name == attrs.name
+      assert budget.description == attrs.description
+      assert budget.start_date == attrs.start_date
+      assert budget.end_date == attrs.end_date
       assert budget.creator_id == user.id
     end
-  end
 
+    test "create_budget/2 require name" do
+      attrs =
+        valid_budget_attributes()
+        |> Map.delete(:name)
+
+      assert {:error, %Ecto.Changeset{} = changeset} = Tracking.create_budget(attrs)
+      assert changeset.valid? == false
+      assert %{name: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "create_budget/2 requires valid dates" do
+      attrs =
+        valid_budget_attributes()
+        |> Map.merge(%{
+          start_date: ~D[2025-12-31],
+          end_date: ~D[2025-01-01]
+        })
+
+      assert {:error, %Ecto.Changeset{} = changeset} =
+                Tracking.create_budget(attrs)
+
+      # errors_on - вспомогательная функция, которая помогает выводить ошибки
+      assert %{end_date: ["must end after start date"]} = errors_on(changeset)
+    end
+  end
 end

@@ -52,6 +52,10 @@ defmodule ThriftBoxWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{ThriftBoxWeb.UserAuth, :require_authenticated}] do
+      live "/budgets", BudgetListLive
+      live "/budgets/new", BudgetListLive, :new
+      live "/budgets/:budget_id", BudgetShowLive
+      live "/budgets/:budget_id/new-transaction", BudgetShowLive, :new_transaction
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
     end

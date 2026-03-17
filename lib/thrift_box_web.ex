@@ -52,6 +52,8 @@ defmodule ThriftBoxWeb do
     quote do
       use Phoenix.LiveView
 
+      import ThriftBox.Guards
+      
       unquote(html_helpers())
     end
   end

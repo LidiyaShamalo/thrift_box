@@ -28,6 +28,7 @@ defmodule ThriftBoxWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import ThriftBoxWeb.ConnCase
+      import Plug.HTML, only: [html_escape: 1]
     end
   end
 
