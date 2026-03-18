@@ -75,7 +75,7 @@ defmodule ThriftBox.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:ex_machina, "~> 2.8.0", only: :test},  # типа mock
-      {:excoveralls, "~> 0.18", only: :test}   #покрытие тестами
+      {:excoveralls, "~> 0.18", only: :test}   #покрытие тестами. Если не запускается, нужно использовать команду: MIX_ENV=test mix coveralls
     ]
   end
 
