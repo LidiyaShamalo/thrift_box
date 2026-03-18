@@ -67,7 +67,7 @@ defmodule ThriftBox.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:ex-machina, "~> 2.8.0", only: :test}
+      {:ex_machina, "~> 2.8.0", only: :test}
     ]
   end
 
