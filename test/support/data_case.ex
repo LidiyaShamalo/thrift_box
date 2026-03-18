@@ -24,6 +24,7 @@ defmodule ThriftBox.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import ThriftBox.DataCase
+      import ThriftBox.Factory
     end
   end
 

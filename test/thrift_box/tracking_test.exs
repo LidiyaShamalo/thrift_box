@@ -1,17 +1,15 @@
 defmodule ThriftBox.TrackingTest do
   use ThriftBox.DataCase
 
-  import ThriftBox.TrackingFixtures
-
   alias ThriftBox.Tracking
 
   describe "budgets" do
     alias ThriftBox.Tracking.Budget
 
-    test "create_budget/2 with valid data creates budget" do
-      user = ThriftBox.AccountsFixtures.user_fixture()
+    test "create_budget/1 with valid data creates budget" do
+      user = insert(:user)
 
-      attrs = valid_budget_attributes(%{creator_id: user.id})
+      attrs = params_with_assocs(:budget, creator: user)
 
       assert {:ok, %Budget{} = budget} = Tracking.create_budget(attrs)
       assert budget.name == attrs.name
@@ -21,19 +19,20 @@ defmodule ThriftBox.TrackingTest do
       assert budget.creator_id == user.id
     end
 
-    test "create_budget/2 require name" do
+    test "create_budget/1 require name" do
       attrs =
-        valid_budget_attributes()
+        params_with_assocs(:budget)
         |> Map.delete(:name)
 
       assert {:error, %Ecto.Changeset{} = changeset} = Tracking.create_budget(attrs)
+
       assert changeset.valid? == false
       assert %{name: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "create_budget/2 requires valid dates" do
+    test "create_budget/1 requires valid dates" do
       attrs =
-        valid_budget_attributes()
+        params_with_assocs(:budget)
         |> Map.merge(%{
           start_date: ~D[2025-12-31],
           end_date: ~D[2025-01-01]
@@ -44,6 +43,30 @@ defmodule ThriftBox.TrackingTest do
 
       # errors_on - вспомогательная функция, которая помогает выводить ошибки
       assert %{end_date: ["must end after start date"]} = errors_on(changeset)
+    end
+
+    test "list_budget/0 return all budgets" do
+      budget = insert(:budget) |> without_preloads()
+
+      assert Tracking.list_budgets() == [budget]
+    end
+
+    test "list_budgets/1 scopes to the provided user" do
+      [budget, _other_budget] = insert_pair(:budget)
+
+      assert Tracking.list_budgets(user: budget.creator) == [without_preloads(budget)]
+    end
+
+    test "get_budget/1 returns the budget with given id" do
+      budget = insert(:budget) |> without_preloads()
+
+      assert Tracking.get_budget(budget.id) == budget
+    end
+
+    test "get_budget/1 return nil when budget doesn't exist" do
+      _unrelated_budget = insert(:budget)
+
+      assert is_nil(Tracking.get_budget("10fe1ad8-6133-5d7d-b5c9-da29581bb923"))
     end
   end
 end

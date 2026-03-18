@@ -2,13 +2,11 @@ defmodule ThriftBoxWeb.BudgetShowLiveTest do
   use ThriftBoxWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
-  import ThriftBox.TrackingFixtures
 
   setup do
-    user = ThriftBox.AccountsFixtures.user_fixture()
-    budget = budget_fixture(%{creator_id: user.id})
+    budget = insert(:budget)
 
-    %{user: user, budget: budget}
+    %{budget: budget, user: budget.creator}
   end
 
   describe "Show budget" do
@@ -35,7 +33,7 @@ defmodule ThriftBoxWeb.BudgetShowLiveTest do
       conn: conn,
       budget: budget
     } do
-      other_user = ThriftBox.AccountsFixtures.user_fixture()
+      other_user = insert(:user)
 
       conn = log_in_user(conn, other_user)
 
