@@ -47,12 +47,12 @@ defmodule ThriftBoxWeb.BudgetShowLive do
     ~H"""
     <.modal
     :if={@live_action == :new_transaction}
-    id="create-transaction-model"
+    id="transaction-model"
     on_cancel={JS.navigate(~p"/budgets/#{@budget}", replace: true)}
     show
     >
       <.live_component
-        module={ThriftBoxWeb.CreateTransactionDialog}
+        module={ThriftBoxWeb.TransactionDialog}
         id="create-transaction"
         budget={@budget}
       />
