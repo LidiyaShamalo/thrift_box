@@ -25,7 +25,7 @@ defmodule ThriftBox.Tracking do
 
     Enum.reduce(criteria, query, fn
       {:user, user}, query ->
-        from b in query, where: b.creator_id == ^user.id
+        from(b in query, where: b.creator_id == ^user.id)
 
       {:preload, bindings}, query ->
         preload(query, ^bindings)
@@ -35,7 +35,7 @@ defmodule ThriftBox.Tracking do
     end)
   end
 
-  def change_budget(budget, attrs \\%{}) do
+  def change_budget(budget, attrs \\ %{}) do
     Budget.changeset(budget, attrs)
   end
 
@@ -46,6 +46,16 @@ defmodule ThriftBox.Tracking do
     %BudgetTransaction{}
     |> BudgetTransaction.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_transaction(%BudgetTransaction{} = transaction, attrs) do
+    transaction
+    |> BudgetTransaction.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_transaction(%BudgetTransaction{} = transaction) do
+    Repo.delete(transaction)
   end
 
   def list_transactions(budget_or_budget_id, criteria \\ [])
@@ -64,11 +74,11 @@ defmodule ThriftBox.Tracking do
 
     Enum.reduce(criteria, query, fn
       {:budget, budget_id}, query ->
-        from t in query, where: t.budget_id == ^budget_id
+        from(t in query, where: t.budget_id == ^budget_id)
 
       {:order_by, binding}, query ->
         # Remove any existing ordering if sort is specified
-        from t in exclude(query, :order_by), order_by: ^binding
+        from(t in exclude(query, :order_by), order_by: ^binding)
 
       {:preload, bindings}, query ->
         preload(query, ^bindings)
@@ -87,9 +97,10 @@ defmodule ThriftBox.Tracking do
 
   def summarize_budget_transactions(budget_id) do
     query =
-      from t in transaction_query(budget: budget_id, order_by: nil),
+      from(t in transaction_query(budget: budget_id, order_by: nil),
         select: [t.type, sum(t.amount)],
         group_by: t.type
+      )
 
     query
     |> Repo.all()
