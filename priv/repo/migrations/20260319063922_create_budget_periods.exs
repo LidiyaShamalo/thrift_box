@@ -7,7 +7,7 @@ defmodule ThriftBox.Repo.Migrations.CreateBudgetPeriods do
       add :start_date, :date
       add :end_date, :date
       add :budget_id, references(:budgets, on_delete: :delete_all, type: :binary_id)
-      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
+      #add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
