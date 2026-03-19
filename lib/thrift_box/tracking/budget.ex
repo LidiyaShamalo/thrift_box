@@ -32,6 +32,8 @@ defmodule ThriftBox.Tracking.Budget do
       )
     |> ThriftBox.Validations.validate_date_month_boundaries()
     |> add_periods()
+  end
+
 
   defp add_periods(%{valid?: false} = changeset), do: changeset
 
@@ -91,4 +93,4 @@ defmodule ThriftBox.Tracking.Budget do
   #     )
   #   end
   # end
-end
+

@@ -31,6 +31,19 @@ defmodule ThriftBoxWeb.CoreComponents do
 
   alias Phoenix.LiveView.JS
 
+  def simple_form(assigns) do
+  ~H"""
+    <.form :let={f} for={@for} as={@as} {@rest}>
+      <div class="mt-10 space-y-8 bg-white">
+        {render_slot(@inner_block, f)}
+        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+          {render_slot(action, f)}
+        </div>
+      </div>
+    </.form>
+  """
+end
+
     @doc """
   Renders a modal.
   """
@@ -220,7 +233,7 @@ defmodule ThriftBoxWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               search select tel text textarea time url week hidden)
+              search select tel text textarea time url week hidden)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -282,7 +295,7 @@ defmodule ThriftBoxWeb.CoreComponents do
           />{@label}
         </span>
       </label>
-      <.error :for={msg <- @errors}>{msg}</.error>
+      <.error :for={msg <- @errors}><%= msg%></.error>
     </div>
     """
   end

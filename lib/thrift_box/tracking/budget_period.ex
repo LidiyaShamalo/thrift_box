@@ -7,7 +7,7 @@ defmodule ThriftBox.Tracking.BudgetPeriod do
   schema "budget_periods" do
     field :start_date, :date
     field :end_date, :date
-    belong_to :budget, ThriftBox.Tracking.Budget
+    belongs_to :budget, ThriftBox.Tracking.Budget
 
     timestamps(type: :utc_datetime)
   end
