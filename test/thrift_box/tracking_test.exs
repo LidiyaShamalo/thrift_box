@@ -14,7 +14,7 @@ defmodule ThriftBox.TrackingTest do
       assert budget.description == attrs.description
       assert budget.start_date == attrs.start_date
       assert budget.end_date == attrs.end_date
-      assert budget.creator_id == attrs.creator_id 
+      assert budget.creator_id == attrs.creator_id
     end
 
     test "create_budget/1 require name" do
@@ -31,8 +31,8 @@ defmodule ThriftBox.TrackingTest do
     test "create_budget/1 requires valid dates" do
       attrs =
           params_with_assocs(:budget,
-          start_date: ~D[2025-12-31],
-          end_date: ~D[2025-01-01]
+          start_date: ~D[2025-12-01],
+          end_date: ~D[2025-01-31]
         )
 
       assert {:error, %Ecto.Changeset{} = changeset} =
