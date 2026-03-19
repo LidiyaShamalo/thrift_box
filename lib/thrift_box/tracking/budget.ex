@@ -13,7 +13,7 @@ defmodule ThriftBox.Tracking.Budget do
     belongs_to(:creator, ThriftBox.Accounts.User)
 
     # has_many :collaborators, ThriftBox.Tracking.BudgetCollaborator
-    # has_many :periods, ThriftBox.Tracking.BudgetPeriod
+    has_many :periods, ThriftBox.Tracking.BudgetPeriod
     # has_one :join_link, ThriftBox.Tracking.BudgetJoinLink
 
     timestamps(type: :utc_datetime)
