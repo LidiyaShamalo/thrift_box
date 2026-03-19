@@ -30,8 +30,21 @@ defmodule ThriftBox.Tracking.Budget do
         name: :budget_and_after_start,
         message: "must end after start date"
       )
+    |> ThriftBox.Validations.validate_date_month_boundaries()
+    |> add_periods()
 
-      def months_between(start_date, end_date, acc \\ []) do
+  defp add_periods(%{valid?: false} = changeset), do: changeset
+
+  defp add_periods(changeset) do
+    start_date = Ecto.Changeset.get_field(changeset, :start_date)
+    end_date = Ecto.Changeset.get_field(changeset, :end_date)
+
+    changeset
+    |> Ecto.Changeset.change(%{periods: months_between(start_date, end_date)})
+    |> Ecto.Changeset.cast_assoc(:periods)
+  end
+
+    def months_between(start_date, end_date, acc \\ []) do
     end_of_month = Date.end_of_month(start_date)
 
     # If we have reached the end of the timespan
@@ -48,20 +61,9 @@ defmodule ThriftBox.Tracking.Budget do
 
 
     # |> validate_end_date_after_start_date()
-    |> ThriftBox.Validations.validate_date_month_boundaries()
-    # |> add_periods()
+
   end
 
-  # defp add_periods(%{valid?: false} = changeset), do: changeset
-
-  # defp add_periods(changeset) do
-  #   start_date = Ecto.Changeset.get_field(changeset, :start_date)
-  #   end_date = Ecto.Changeset.get_field(changeset, :end_date)
-
-  #   changeset
-  #   |> Ecto.Changeset.change(%{periods: months_between(start_date, end_date)})
-  #   |> Ecto.Changeset.cast_assoc(:periods)
-  # end
 
   # defp validate_end_date_after_start_date(changeset) do
   #   start_date = get_field(changeset, :start_date)
