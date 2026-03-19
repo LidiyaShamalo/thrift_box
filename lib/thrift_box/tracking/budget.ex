@@ -31,6 +31,21 @@ defmodule ThriftBox.Tracking.Budget do
         message: "must end after start date"
       )
 
+      def months_between(start_date, end_date, acc \\ []) do
+    end_of_month = Date.end_of_month(start_date)
+
+    # If we have reached the end of the timespan
+    if not Date.after?(end_date, end_of_month) do
+      Enum.reverse([%{start_date: start_date, end_date: end_of_month} | acc])
+    else
+      months_between(
+        Date.add(end_of_month, 1),
+        end_date,
+        [%{start_date: start_date, end_date: end_of_month} | acc]
+      )
+    end
+  end
+
 
     # |> validate_end_date_after_start_date()
     |> ThriftBox.Validations.validate_date_month_boundaries()
